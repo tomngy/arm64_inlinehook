@@ -1,0 +1,44 @@
+/**
+ * @author      : wuzheng 
+ * @file        : arm64_jmptable
+ * @created     : Monday Mar 01, 2021 14:21:17 CST
+ */
+
+#ifndef ARM64_JMPTABLE_H
+#define ARM64_JMPTABLE_H
+
+#include <stdint.h>
+/*
+* 参考libc中read等等系统调用的实现，第一句都是mov X8, syscall_no
+* 说明函数调用X8寄存器肯定是不需要保存的，所以函数级的inlinehook可以用X8做临时寄存器做跳转
+* 最短的跳转代码长度为4指令，16字节
+*/
+
+static unsigned char arm64_jmp_code[16] = {
+    0x48, 0x00, 0x00, 0x58,  
+    0x00, 0x01, 0x1f, 0xd6, 
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00
+};
+
+//使用x17理论上也没有问题
+static unsigned char arm64_jmp_code2[16] = {
+    0x51, 0x00, 0x00, 0x58,  //ldr x17, #8
+    0x20, 0x02, 0x1f, 0xd6,  //br x17
+    0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00
+};
+
+//仿plt，br前添加add指令
+static unsigned char arm64_jmp_code3[20] = {
+    0x71, 0x00, 0x00, 0x58, //ldr x17, #0xc 
+    0x10, 0x06, 0x00, 0x91, //add add     x16, x16, #1
+    0x20, 0x02, 0x1f, 0xd6, //br x17
+    0x56, 0x45, 0x34, 0x23, 
+    0x12, 0x01, 0x00, 0x00
+};
+
+//数据做8字节对齐
+
+#endif /* end of include guard ARM64_JMPTABLE_H */
+
