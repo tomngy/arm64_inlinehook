@@ -5,7 +5,7 @@
   arm64跳转指令优先使用adrp
   在不能使用adrp的情况下使用ldr指令，但针对arm64指令乱序执行的情况作了优化
 
-- usage
+- 使用方法
 ```
 void *func_addr = &open;
 void *hooked_open_addr = (void *)&hooked_open;
